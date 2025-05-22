@@ -3,24 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Текущее время и погода в Никосии</title>
+    <title>Время и погода</title> <!-- Changed -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Текущее время и погода в Никосии</h1>
+        <h1>Текущее время и погода</h1> <!-- Changed -->
         
+        <div id="city-input-container"> <!-- Added -->
+            <input type="text" id="city-input" placeholder="Введите город" value="Никосия"> <!-- Added value -->
+            <button id="show-weather-btn">Показать погоду</button>
+        </div>
+
         <div id="time-info">
             <p>Текущее время: <span id="current-time">--:--:--</span></p>
         </div>
         
         <div id="weather-info">
             <h2>Погода</h2>
-            <p>Город: <span id="city-name">Никосия</span></p>
+            <p>Город: <span id="city-name">--</span></p> <!-- Default to empty, will be filled by JS -->
             <p>Температура: <span id="temperature">--</span>°C</p>
             <p>Описание: <span id="weather-description">--</span></p>
             <img id="weather-icon" src="" alt="Иконка погоды">
             <p>Качество воздуха (AQI): <span id="aqi">--</span></p>
+        </div>
+
+        <div id="forecast-info"> <!-- Added -->
+            <h2>Прогноз на 5 дней</h2>
+            <div id="forecast-container">
+                <!-- Forecast data will be injected here by JavaScript -->
+            </div>
         </div>
     </div>
 

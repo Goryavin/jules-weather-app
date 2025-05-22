@@ -15,6 +15,8 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 90%; /* Added */
+    max-width: 600px; /* Added */
 }
 
 h1 {
@@ -52,4 +54,128 @@ h2 {
 /* Add some spacing between info sections */
 #time-info {
     margin-bottom: 20px;
+}
+
+/* Added styles for city input and button */
+#city-input-container {
+    margin-bottom: 20px;
+    display: flex; /* For aligning input and button */
+    justify-content: center; /* Center items if they don't fill width */
+    gap: 10px; /* Space between input and button */
+}
+
+#city-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    flex-grow: 1; /* Allow input to take available space */
+    max-width: 300px; /* Prevent it from becoming too wide */
+}
+
+#show-weather-btn {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#show-weather-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Added styles for the 5-day forecast section */
+#forecast-info {
+    margin-top: 30px;
+}
+
+#forecast-container {
+    display: flex;
+    justify-content: space-between; /* Distribute space between forecast items */
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: 10px; /* Space between forecast items */
+}
+
+.forecast-day {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    flex-basis: calc(20% - 10px); /* Aim for 5 items per row, adjust for gap */
+    min-width: 100px; /* Minimum width before wrapping or shrinking too much */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+.forecast-day img {
+    width: 40px;
+    height: 40px;
+}
+
+.forecast-day p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+/* Added media queries for responsiveness */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.6em;
+    }
+
+    h2 {
+        font-size: 1.3em;
+    }
+
+    #city-input-container {
+        flex-direction: column; /* Stack input and button */
+        align-items: stretch; /* Make input and button full width */
+    }
+
+    #city-input {
+        max-width: none; /* Allow input to take full width */
+    }
+    
+    #show-weather-btn {
+        width: 100%; /* Button takes full width */
+    }
+
+    #forecast-container {
+        flex-direction: column; /* Stack forecast days vertically */
+        align-items: center; /* Center items */
+    }
+
+    .forecast-day {
+        flex-basis: 100%; /* Each day takes full width */
+        width: 80%; /* Or a specific width like 200px, adjust as needed */
+        margin-bottom: 10px; /* Add space between stacked days */
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.4em;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+
+    #time-info p,
+    #weather-info p,
+    .forecast-day p {
+        font-size: 0.9em;
+    }
+     .forecast-day {
+        width: 95%; 
+    }
 }
