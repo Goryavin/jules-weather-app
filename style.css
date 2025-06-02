@@ -121,6 +121,31 @@ h2 {
     font-size: 0.9em;
 }
 
+/* Styles for Asset Prices Section */
+#asset-prices-info {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #f9f9f9; /* Slightly different background to group it */
+    border: 1px solid #eee;
+    border-radius: 6px;
+}
+
+#asset-prices-info h2 {
+    margin-top: 0; /* Remove default top margin if h2 already has one */
+    font-size: 1.3em; /* Consistent with other h2s or adjust as needed */
+    color: #333;
+    border-bottom: 1px solid #ddd; /* Separator line for the section title */
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+#asset-prices-info p {
+    font-size: 1.1em; /* Consistent with other data paragraphs */
+    line-height: 1.6;
+    margin: 8px 0;
+    color: #333;
+}
+
 /* Added media queries for responsiveness */
 @media (max-width: 768px) {
     .container {
@@ -144,7 +169,7 @@ h2 {
     #city-input {
         max-width: none; /* Allow input to take full width */
     }
-    
+
     #show-weather-btn {
         width: 100%; /* Button takes full width */
     }
@@ -176,6 +201,6 @@ h2 {
         font-size: 0.9em;
     }
      .forecast-day {
-        width: 95%; 
+        width: 95%;
     }
 }

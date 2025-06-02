@@ -12,10 +12,14 @@ const aqiElement = document.getElementById('aqi');
 const cityInputElement = document.getElementById('city-input');
 const showWeatherButton = document.getElementById('show-weather-btn');
 const forecastContainer = document.getElementById('forecast-container');
-const pageTitleElement = document.querySelector('title'); // For updating page title
-const mainHeadingElement = document.querySelector('h1'); // For updating main heading
+const pageTitleElement = document.querySelector('title');
+const mainHeadingElement = document.querySelector('h1');
 
-// Function to update the current time
+// New DOM Elements for Asset Prices
+const bitcoinPriceElement = document.getElementById('bitcoin-price');
+const goldPriceElement = document.getElementById('gold-price');
+
+// --- Existing time functions ---
 function updateTime() {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
@@ -26,31 +30,26 @@ function updateTime() {
     }
 }
 
+// --- Existing weather functions (fetchWeather, fetchAirQuality, fetchForecast, displayError, updateWeatherData) ---
+// (Keep all existing weather-related functions as they are)
 // Function to display error messages to the user
 function displayError(message) {
     if (weatherDescriptionElement) weatherDescriptionElement.textContent = message;
-    // Clear other fields that might show old data
     if (temperatureElement) temperatureElement.textContent = '--';
     if (weatherIconElement) weatherIconElement.src = '';
     if (aqiElement) aqiElement.textContent = '--';
     if (forecastContainer) forecastContainer.innerHTML = '<p>Не удалось загрузить прогноз.</p>';
 }
 
-// Function to fetch and display weather data
 async function fetchWeather(city) {
     const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=ru`;
-
     try {
         const response = await fetch(weatherUrl);
         if (!response.ok) {
-            if (response.status === 404) {
-                throw new Error(`Город "${city}" не найден.`);
-            } else {
-                throw new Error(`Ошибка получения погоды: ${response.status}`);
-            }
+            if (response.status === 404) throw new Error(`Город "${city}" не найден.`);
+            else throw new Error(`Ошибка получения погоды: ${response.status}`);
         }
         const data = await response.json();
-
         if (cityNameElement) cityNameElement.textContent = data.name;
         if (temperatureElement) temperatureElement.textContent = data.main.temp;
         if (weatherDescriptionElement) weatherDescriptionElement.textContent = data.weather[0].description;
@@ -58,35 +57,26 @@ async function fetchWeather(city) {
             weatherIconElement.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
             weatherIconElement.alt = data.weather[0].description;
         }
-        
-        // Update page title and heading
         const pageTitle = `Погода в ${data.name}`;
         if (pageTitleElement) pageTitleElement.textContent = pageTitle;
-        // mainHeadingElement.textContent = `Текущее время и погода в ${data.name}`; // Decided against this to keep heading more static
-
-        return { lat: data.coord.lat, lon: data.coord.lon, name: data.name }; // Return coordinates for AQI
+        return { lat: data.coord.lat, lon: data.coord.lon, name: data.name };
     } catch (error) {
         console.error('Error fetching weather data:', error);
         displayError(error.message || 'Не удалось загрузить данные о погоде.');
-        return null; // Indicate failure
+        return null;
     }
 }
 
-// Function to fetch and display Air Quality Index (AQI)
 async function fetchAirQuality(lat, lon) {
     if (lat === undefined || lon === undefined) {
         if (aqiElement) aqiElement.textContent = 'Координаты не указаны.';
         return;
     }
     const airQualityUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
-
     try {
         const response = await fetch(airQualityUrl);
-        if (!response.ok) {
-            throw new Error(`Ошибка получения AQI: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Ошибка получения AQI: ${response.status}`);
         const data = await response.json();
-
         if (data.list && data.list.length > 0) {
             const aqiValue = data.list[0].main.aqi;
             let aqiText = '';
@@ -108,50 +98,34 @@ async function fetchAirQuality(lat, lon) {
     }
 }
 
-// Function to fetch and display 5-day weather forecast
 async function fetchForecast(city) {
     const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang=ru`;
-
     try {
         const response = await fetch(forecastUrl);
         if (!response.ok) {
-             if (response.status === 404) { // City not found is already handled by fetchWeather
-                throw new Error(`Прогноз для "${city}" не найден.`);
-            } else {
-                throw new Error(`Ошибка получения прогноза: ${response.status}`);
-            }
+            if (response.status === 404) throw new Error(`Прогноз для "${city}" не найден.`);
+            else throw new Error(`Ошибка получения прогноза: ${response.status}`);
         }
         const data = await response.json();
-
-        if (forecastContainer) forecastContainer.innerHTML = ''; // Clear previous forecast
-
-        // Process forecast data (complex part, simplify by taking one forecast per day around noon)
+        if (forecastContainer) forecastContainer.innerHTML = '';
         const dailyData = {};
         data.list.forEach(item => {
             const date = item.dt_txt.split(' ')[0];
             if (!dailyData[date]) {
-                dailyData[date] = {
-                    temps: [],
-                    descriptions: [],
-                    icons: []
-                };
+                dailyData[date] = { temps: [], descriptions: [], icons: [] };
             }
             dailyData[date].temps.push(item.main.temp);
             dailyData[date].descriptions.push(item.weather[0].description);
             dailyData[date].icons.push(item.weather[0].icon);
         });
-
         let count = 0;
         for (const date in dailyData) {
-            if (count >= 5) break; // Limit to 5 days
-
+            if (count >= 5) break;
             const dayInfo = dailyData[date];
             const minTemp = Math.min(...dayInfo.temps);
             const maxTemp = Math.max(...dayInfo.temps);
-            // For simplicity, take the most frequent icon/description or the one around midday
             const typicalIcon = dayInfo.icons[Math.floor(dayInfo.icons.length / 2)];
             const typicalDescription = dayInfo.descriptions[Math.floor(dayInfo.descriptions.length / 2)];
-            
             const dayElement = document.createElement('div');
             dayElement.classList.add('forecast-day');
             dayElement.innerHTML = `
@@ -170,59 +144,97 @@ async function fetchForecast(city) {
     }
 }
 
-// Function to handle fetching all weather-related data for a city
 async function updateWeatherData(city) {
     if (!city) {
         displayError("Введите название города.");
         return;
     }
-    
-    // Clear previous AQI and forecast while new data is loading
     if (aqiElement) aqiElement.textContent = 'Загрузка...';
     if (forecastContainer) forecastContainer.innerHTML = '<p>Загрузка прогноза...</p>';
-
-
-    const weatherData = await fetchWeather(city); // This now returns {lat, lon, name} or null
+    const weatherData = await fetchWeather(city);
     if (weatherData) {
         await fetchAirQuality(weatherData.lat, weatherData.lon);
-        await fetchForecast(city); // Use original city query for forecast for consistency
-                                   // or weatherData.name if API guarantees it's good for querying
+        await fetchForecast(city);
     } else {
-        // Error message is already displayed by fetchWeather
-        // Clear AQI and forecast if weather fetch failed
         if (aqiElement) aqiElement.textContent = '--';
         if (forecastContainer) forecastContainer.innerHTML = '<p>Прогноз не доступен из-за ошибки загрузки текущей погоды.</p>';
     }
 }
 
-// Event Listener for the "Show Weather" button
+
+// --- New functions for Bitcoin and Gold prices ---
+async function fetchBitcoinPrice() {
+    if (!bitcoinPriceElement) return;
+    const url = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd';
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`CoinGecko API error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.bitcoin && data.bitcoin.usd) {
+            bitcoinPriceElement.textContent = `Bitcoin (BTC): $${data.bitcoin.usd.toLocaleString()}`;
+        } else {
+            bitcoinPriceElement.textContent = 'Bitcoin (BTC): Цена не найдена';
+        }
+    } catch (error) {
+        console.error('Error fetching Bitcoin price:', error);
+        bitcoinPriceElement.textContent = 'Bitcoin (BTC): Не удалось загрузить цену';
+    }
+}
+
+async function fetchGoldPrice() {
+    if (!goldPriceElement) return;
+    // Placeholder implementation as per plan
+    // In a real scenario, you would make an API call here.
+    // Example: const goldApiUrl = 'SOME_GOLD_API_URL';
+    // try {
+    //     const response = await fetch(goldApiUrl);
+    //     if (!response.ok) throw new Error('Gold API error!');
+    //     const data = await response.json();
+    //     // Process data and update goldPriceElement.textContent
+    // } catch (error) {
+    //     console.error('Error fetching gold price:', error);
+    //     goldPriceElement.textContent = 'Gold (XAU): Не удалось загрузить цену';
+    // }
+    goldPriceElement.textContent = 'Gold (XAU): $2,023.50 USD (Пример)'; // Placeholder
+}
+
+// --- Event Listeners ---
 if (showWeatherButton) {
     showWeatherButton.addEventListener('click', () => {
         const city = cityInputElement.value.trim();
         updateWeatherData(city);
     });
 }
-
-// Allow submitting city with Enter key in input field
 if (cityInputElement) {
     cityInputElement.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent form submission if it were in a form
-            showWeatherButton.click(); // Trigger button click
+            event.preventDefault();
+            showWeatherButton.click();
         }
     });
 }
 
-
-// Initial calls and interval setup
+// --- Initial calls and intervals ---
 document.addEventListener('DOMContentLoaded', () => {
-    updateTime(); // Initial call to display time immediately
-    setInterval(updateTime, 1000); // Update time every second
+    // Time update
+    updateTime();
+    setInterval(updateTime, 1000);
 
-    // Load weather for default city (Nicosia) on page load
+    // Weather update for default city
     const initialCity = cityInputElement.value.trim() || defaultCity;
-    if (cityInputElement && !cityInputElement.value.trim()) { // If input is empty, set to default
+    if (cityInputElement && !cityInputElement.value.trim()) {
         cityInputElement.value = defaultCity;
     }
     updateWeatherData(initialCity);
+
+    // Asset prices initial fetch
+    fetchBitcoinPrice();
+    fetchGoldPrice();
+
+    // Set interval for asset prices (every 10 minutes)
+    const assetUpdateInterval = 10 * 60 * 1000; // 10 minutes in milliseconds
+    setInterval(fetchBitcoinPrice, assetUpdateInterval);
+    setInterval(fetchGoldPrice, assetUpdateInterval); // This will just refresh the placeholder for now
 });

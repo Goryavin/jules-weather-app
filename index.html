@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <h1>Текущее время и погода</h1> <!-- Changed -->
-        
+
         <div id="city-input-container"> <!-- Added -->
             <input type="text" id="city-input" placeholder="Введите город" value="Никосия"> <!-- Added value -->
             <button id="show-weather-btn">Показать погоду</button>
@@ -18,7 +18,7 @@
         <div id="time-info">
             <p>Текущее время: <span id="current-time">--:--:--</span></p>
         </div>
-        
+
         <div id="weather-info">
             <h2>Погода</h2>
             <p>Город: <span id="city-name">--</span></p> <!-- Default to empty, will be filled by JS -->
@@ -33,6 +33,12 @@
             <div id="forecast-container">
                 <!-- Forecast data will be injected here by JavaScript -->
             </div>
+        </div>
+
+        <div id="asset-prices-info">
+            <h2>Курсы активов</h2>
+            <p id="bitcoin-price">Bitcoin (BTC): Загрузка...</p>
+            <p id="gold-price">Gold (XAU): Загрузка...</p>
         </div>
     </div>
 
